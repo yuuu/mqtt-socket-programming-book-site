@@ -25,7 +25,7 @@ end
 
 def receive_mqtt_connack_packet(sock)
   packet = sock.read(4).unpack('C*')
-  return false if packet[0] != 0x20 || packet[1] != 0x02 || packet[3] != 0x00
+  return if packet != [0x20, 0x02, 0x00, 0x00]
 
   puts 'MQTT 接続成功'
   true

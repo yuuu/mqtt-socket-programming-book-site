@@ -31,8 +31,8 @@ int send_mqtt_connect_packet(int sock, char* client_id) {
     packet[packet_len++] = 0x3C; // Keep Alive LSB (60 seconds)
 
     // Payload
-    packet[packet_len++] = 0x00;                                    // Client ID Length MSB
-    unsigned char client_id_len = strlen(client_id);           // Client ID Length LSB
+    packet[packet_len++] = 0x00;                            // Client ID Length MSB
+    unsigned char client_id_len = strlen(client_id);        // Client ID Length LSB
 
     packet[packet_len++] = client_id_len;
     strncpy(&packet[packet_len], client_id, client_id_len); // Client ID
@@ -60,7 +60,7 @@ int receive_mqtt_connack_packet(int sock) {
         return -1;
     }
 
-    if (packet[3] != 0x00) {
+    if (packet[2] != 0x00 || packet[3] != 0x00) {
         fprintf(stderr, "ERR: MQTT 接続失敗\n");
         return -1;
     }
