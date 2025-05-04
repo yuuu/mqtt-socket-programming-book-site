@@ -20,11 +20,11 @@ def send_mqtt_connect_packet(sock, client_id)
   packet += [0x00, client_id.bytesize]
   packet += client_id.bytes
 
-  sock.write(packet.pack('C*'))
+  sock.send(packet.pack('C*'), 0)
 end
 
 def receive_mqtt_connack_packet(sock)
-  packet = sock.read(4).unpack('C*')
+  packet = sock.recv(4).unpack('C*')
   return if packet != [0x20, 0x02, 0x00, 0x00]
 
   puts 'MQTT 接続成功'
@@ -48,7 +48,7 @@ def send_mqtt_publish_packet(sock, topic, message)
   # Payload
   packet += message.bytes
 
-  sock.write(packet.pack('C*'))
+  sock.send(packet.pack('C*'), 0)
 end
 
 def send_mqtt_subscribe_packet(sock, topic)
@@ -69,11 +69,11 @@ def send_mqtt_subscribe_packet(sock, topic)
   packet += topic.bytes
   packet << 0x00
 
-  sock.write(packet.pack('C*'))
+  sock.send(packet.pack('C*'), 0)
 end
 
 def receive_mqtt_suback_packet(sock)
-  packet = sock.read(5).unpack('C*')
+  packet = sock.recv(5).unpack('C*')
   return false if packet[0] != 0x90 || packet[1] != 0x03 || packet[4] != 0x00
 
   puts 'MQTT 購読成功'
@@ -81,14 +81,19 @@ def receive_mqtt_suback_packet(sock)
 end
 
 def receive_mqtt_publish_packet(sock)
-  packet = sock.read(32).unpack('C*')
+  packet = sock.recv(32).unpack('C*')
   return false if packet[0] != 0x30
 
+  topic_length = (packet[2] << 8) | packet[3]
+  topic = packet[4, topic_length].pack('C*')
+  message = packet[(4 + topic_length)..(1 + packet[1])].pack('C*')
+
   puts 'MQTT PUBLISH パケットを受信しました'
+  puts "トピック: #{topic}, メッセージ: #{message}"
   true
 end
 
 def send_mqtt_disconnect_packet(sock)
   packet = [0xE0, 0x00]
-  sock.write(packet.pack('C*'))
+  sock.send(packet.pack('C*'), 0)
 end

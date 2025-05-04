@@ -4,6 +4,8 @@
 
 #include "mqtt.h"
 
+#define MQTT_FIXED_HEADER_SIZE 2
+
 int send_mqtt_connect_packet(int sock, char* client_id) {
     char packet[32];
     int packet_len = 0;
@@ -13,7 +15,7 @@ int send_mqtt_connect_packet(int sock, char* client_id) {
 
     // Remaining Length
     unsigned char variable_header_len = 10;
-    unsigned char payload_len = 2 + strlen(client_id);
+    unsigned char payload_len = MQTT_FIXED_HEADER_SIZE + strlen(client_id);
 
     unsigned char remaining_len = variable_header_len + payload_len;
     packet[packet_len++] = remaining_len;
@@ -78,7 +80,7 @@ int send_mqtt_publish_packet(int sock) {
 
     // Remaining Length
     unsigned char topic_len = strlen(MQTT_TOPIC); // Topic Length LSB
-    unsigned char variable_header_len = 2 + topic_len;
+    unsigned char variable_header_len = MQTT_FIXED_HEADER_SIZE + topic_len;
     unsigned char payload_len = strlen(MQTT_MESSAGE); // Topic Length LSB
 
     unsigned char remaining_len = variable_header_len + payload_len;
@@ -111,7 +113,7 @@ int send_mqtt_subscribe_packet(int sock) {
     // Remaining Length
     unsigned char variable_header_len = 2;
     unsigned char topic_len = strlen(MQTT_TOPIC);        // Topic Length LSB
-    unsigned char payload_len = 2 + topic_len + 1;
+    unsigned char payload_len = MQTT_FIXED_HEADER_SIZE + topic_len + 1;
 
     unsigned char remaining_len = variable_header_len + payload_len;
     packet[packet_len++] = remaining_len;
@@ -174,7 +176,20 @@ int receive_mqtt_publish_packet(int sock) {
         return -1;
     }
 
+    unsigned char remaining_length = packet[1];
+    unsigned short topic_length = (packet[2] << 8) | packet[3];
+    char topic[topic_length + 1];
+    strncpy(topic, &packet[4], topic_length);
+    topic[topic_length] = '\0';
+
+    unsigned short message_length = remaining_length - topic_length - MQTT_FIXED_HEADER_SIZE;
+    char message[message_length + 1];
+    strncpy(message, &packet[4 + topic_length], message_length);
+    message[message_length] = '\0';
+
     printf("MQTT PUBLISH パケットを受信しました\n");
+    printf("トピック: %s, メッセージ: %s\n", topic, message);
+
     return 0;
 }
 
