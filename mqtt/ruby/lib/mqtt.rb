@@ -25,7 +25,7 @@ end
 
 def receive_mqtt_connack_packet(sock)
   packet = sock.recv(4).unpack('C*')
-  return if packet != [0x20, 0x02, 0x00, 0x00]
+  return false if packet != [0x20, 0x02, 0x00, 0x00]
 
   puts 'MQTT 接続成功'
   true
@@ -74,7 +74,7 @@ end
 
 def receive_mqtt_suback_packet(sock)
   packet = sock.recv(5).unpack('C*')
-  return false if packet[0] != 0x90 || packet[1] != 0x03 || packet[4] != 0x00
+  return false if packet != [0x90, 0x03, 0x00, 0x01, 0x00]
 
   puts 'MQTT 購読成功'
   true

@@ -147,7 +147,7 @@ int receive_mqtt_suback_packet(int sock) {
         return -1;
     }
 
-    if (packet[0] != 0x90 || packet[1] != 0x03) {
+    if (packet[0] != 0x90 || packet[1] != 0x03 || packet[2] != 0x00 || packet[3] != 0x01) {
         fprintf(stderr, "ERR: 不正な MQTT SUBACK パケット\n");
         return -1;
     }
