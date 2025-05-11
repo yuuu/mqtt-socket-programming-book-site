@@ -3,10 +3,10 @@
 require 'socket'
 
 SERVER_HOST = '127.0.0.1'
-SERCER_PORT = 49_152
+SERVER_PORT = 49_152
 
 socket = Socket.new(Socket::AF_INET, Socket::SOCK_STREAM)
-sockeaddr = Socket.sockaddr_in(SERCER_PORT, SERVER_HOST)
+sockeaddr = Socket.sockaddr_in(SERVER_PORT, SERVER_HOST)
 socket.connect(sockeaddr)
 
 puts 'Enter messages to send to the server.'
