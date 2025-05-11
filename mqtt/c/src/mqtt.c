@@ -194,7 +194,7 @@ int receive_mqtt_publish_packet(int sock) {
 }
 
 int send_mqtt_disconnect_packet(int sock) {
-    char packet[4];
+    char packet[2];
     int packet_len = 0;
 
     // Fixed Header
