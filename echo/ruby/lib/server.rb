@@ -6,8 +6,8 @@ SERVER_HOST = '127.0.0.1'
 SERVER_PORT = 49_152
 
 socket = Socket.new(Socket::AF_INET, Socket::SOCK_STREAM)
-sockeaddr = Socket.sockaddr_in(SERVER_PORT, SERVER_HOST)
-socket.bind(sockeaddr)
+sockaddr = Socket.sockaddr_in(SERVER_PORT, SERVER_HOST)
+socket.bind(sockaddr)
 socket.listen(1)
 
 puts "Echo server is running on port #{SERVER_PORT}..."
